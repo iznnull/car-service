@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class CarServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<CarServiceApplication>(*args)
+    runApplication<CarServiceApplication>(*args)
 }

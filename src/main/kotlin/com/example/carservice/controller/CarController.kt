@@ -18,4 +18,10 @@ class CarController(private val carRepository: CarRepository, private val carMap
 
     @PostMapping()
     fun addCar(@RequestBody carDto: CarDto) = carRepository.save(carMapper.toCarModel(carDto))
+
+//    @PutMapping(path = ["{carId}"])
+//    fun updateCar(@PathVariable carId: Long, @RequestBody carDto: CarDto) = carRepository.save(carId, carMapper.toCarModel(carDto))
+
+    @DeleteMapping(path = ["{carId}"])
+    fun deleteCar(@PathVariable carId: Long) = carRepository.deleteById(carId)
 }

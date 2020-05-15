@@ -17,7 +17,7 @@ data class Car (
     var model: String,
 
     @Column(nullable = false)
-    var color: Int,
+    var color: String,
 
     @Column(nullable = false)
     var price: Double)
