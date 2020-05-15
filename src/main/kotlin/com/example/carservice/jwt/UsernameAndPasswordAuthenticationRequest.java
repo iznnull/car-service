@@ -11,5 +11,6 @@ public class UsernameAndPasswordAuthenticationRequest {
 
     public String getPassword() {
         return password;
+
     }
 }

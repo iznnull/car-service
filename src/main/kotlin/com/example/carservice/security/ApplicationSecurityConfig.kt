@@ -1,6 +1,7 @@
 package com.example.carservice.security
 
 import com.example.carservice.auth.UserService
+import com.example.carservice.jwt.JwtTokenVerifier
 import com.example.carservice.jwt.JwtUsernameAndPasswordAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,12 +24,13 @@ class ApplicationSecurityConfig(private val passwordEncoder: PasswordEncoder, pr
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter::class.java)
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-                .antMatchers(HttpMethod.DELETE, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
-                .antMatchers(HttpMethod.POST, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
-                .antMatchers(HttpMethod.PUT, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
-                .antMatchers(HttpMethod.GET, "/cars/**").hasAnyRole(UserRole.ADMIN.name, UserRole.USER.name)
+//                .antMatchers(HttpMethod.DELETE, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
+//                .antMatchers(HttpMethod.POST, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
+//                .antMatchers(HttpMethod.PUT, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
+//                .antMatchers(HttpMethod.GET, "/cars/**").hasAnyRole(UserRole.ADMIN.name, UserRole.USER.name)
                 .anyRequest()
                 .authenticated()
     }

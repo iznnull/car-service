@@ -40,6 +40,6 @@ class JwtUsernameAndPasswordAuthenticationFilter : UsernamePasswordAuthenticatio
                 .setExpiration(Date.valueOf(LocalDate.now().plusWeeks(2)))
                 .signWith(Keys.hmacShaKeyFor(key.toByteArray()))
                 .compact()
-        response?.addHeader("Authorization", token)
+        response?.addHeader("Authorization", "Bearer $token")
     }
 }
