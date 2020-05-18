@@ -1,11 +1,11 @@
 package com.example.carservice.security
 
 import com.example.carservice.auth.UserService
+import com.example.carservice.jwt.JwtConfig
 import com.example.carservice.jwt.JwtTokenVerify
 import com.example.carservice.jwt.JwtUsernameAndPasswordAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -16,15 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-class ApplicationSecurityConfig(private val passwordEncoder: PasswordEncoder, private val userService: UserService) : WebSecurityConfigurerAdapter() {
+class ApplicationSecurityConfig(private val passwordEncoder: PasswordEncoder, private val userService: UserService, private val jwtConfig: JwtConfig) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
-                .addFilterAfter(JwtTokenVerify(), JwtUsernameAndPasswordAuthenticationFilter::class.java)
+                .addFilter(JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig))
+                .addFilterAfter(JwtTokenVerify(jwtConfig), JwtUsernameAndPasswordAuthenticationFilter::class.java)
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
                 //TODO endpoint access and method by role

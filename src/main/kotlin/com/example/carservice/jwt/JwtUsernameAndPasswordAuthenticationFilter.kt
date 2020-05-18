@@ -17,8 +17,11 @@ import javax.servlet.http.HttpServletResponse
 
 class JwtUsernameAndPasswordAuthenticationFilter : UsernamePasswordAuthenticationFilter {
 
-    constructor(authenticationManager: AuthenticationManager) : super() {
+    private var jwtConfig: JwtConfig;
+
+    constructor(authenticationManager: AuthenticationManager, jwtConfig: JwtConfig) : super() {
         this.authenticationManager = authenticationManager
+        this.jwtConfig = jwtConfig
     }
 
     @Throws(AuthenticationException::class)
@@ -33,14 +36,12 @@ class JwtUsernameAndPasswordAuthenticationFilter : UsernamePasswordAuthenticatio
     }
 
     override fun successfulAuthentication(request: HttpServletRequest?, response: HttpServletResponse?, chain: FilterChain?, authResult: Authentication?) {
-        //TODO key in propertie
-        val key = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecure"
         val token: String = Jwts.builder()
                 .setSubject(authResult?.name)
                 .claim("authorities", authResult?.authorities)
-                .setExpiration(Date.valueOf(LocalDate.now().plusWeeks(2)))
-                .signWith(Keys.hmacShaKeyFor(key.toByteArray()))
+                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays.toLong())))
+                .signWith(Keys.hmacShaKeyFor(jwtConfig.secretKey.toByteArray()))
                 .compact()
-        response?.addHeader("Authorization", "Bearer $token")
+        response?.addHeader("Authorization", jwtConfig.tokenPrefix + token)
     }
 }
