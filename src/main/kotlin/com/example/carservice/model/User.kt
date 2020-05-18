@@ -1,15 +1,13 @@
 package com.example.carservice.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
 
 @Entity
-@SequenceGenerator(name = "IdSequenceUser")
 data class User(
-        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "IdSequenceUser")
         @Id
-        var id: Long? = null,
-
         @Column(nullable = false)
         var username: String,
 
