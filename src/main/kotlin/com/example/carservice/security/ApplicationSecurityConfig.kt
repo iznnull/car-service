@@ -27,6 +27,7 @@ class ApplicationSecurityConfig(private val passwordEncoder: PasswordEncoder, pr
                 .addFilterAfter(JwtTokenVerify(), JwtUsernameAndPasswordAuthenticationFilter::class.java)
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
+                //TODO endpoint access and method by role
 //                .antMatchers(HttpMethod.DELETE, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
 //                .antMatchers(HttpMethod.POST, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
 //                .antMatchers(HttpMethod.PUT, "/cars/**").hasAnyRole(UserRole.ADMIN.name)
