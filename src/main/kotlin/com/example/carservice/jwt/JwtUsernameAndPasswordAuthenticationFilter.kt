@@ -33,7 +33,6 @@ class JwtUsernameAndPasswordAuthenticationFilter : UsernamePasswordAuthenticatio
     }
 
     override fun successfulAuthentication(request: HttpServletRequest?, response: HttpServletResponse?, chain: FilterChain?, authResult: Authentication?) {
-        //TODO key in propertie
         val key = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecure"
         val token: String = Jwts.builder()
                 .setSubject(authResult?.name)

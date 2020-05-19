@@ -5,7 +5,6 @@ import com.example.carservice.jwt.JwtTokenVerify
 import com.example.carservice.jwt.JwtUsernameAndPasswordAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -13,6 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +23,8 @@ class ApplicationSecurityConfig(private val passwordEncoder: PasswordEncoder, pr
     override fun configure(http: HttpSecurity) {
         http
                 .csrf().disable()
+                .cors()
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
@@ -38,6 +42,15 @@ class ApplicationSecurityConfig(private val passwordEncoder: PasswordEncoder, pr
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.authenticationProvider(daoAuthProvider())
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource? {
+        val source = UrlBasedCorsConfigurationSource()
+        val corsConfiguration = CorsConfiguration()
+        corsConfiguration.addExposedHeader("Authorization")
+        source.registerCorsConfiguration("/**", corsConfiguration.applyPermitDefaultValues())
+        return source
     }
 
     @Bean
