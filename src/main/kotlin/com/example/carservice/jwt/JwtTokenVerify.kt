@@ -2,6 +2,7 @@ package com.example.carservice.jwt
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -14,32 +15,33 @@ import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class JwtTokenVerify : OncePerRequestFilter() {
+class JwtTokenVerify(private val jwtConfig: JwtConfig) : OncePerRequestFilter() {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-        val token: String = request.getHeader("Authorization").toString().replace("Bearer ", "")
-        val key = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecure"
+        val token: String = request.getHeader("Authorization").toString().replace(jwtConfig.tokenPrefix, "")
 
-        val claimsJws: Jws<Claims> = Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(key.toByteArray()))
-                .parseClaimsJws(token)
+        try {
+            val claimsJws: Jws<Claims> = Jwts.parser()
+                    .setSigningKey(Keys.hmacShaKeyFor(jwtConfig.secretKey.toByteArray()))
+                    .parseClaimsJws(token)
 
-        val authorities: (List<Map<String, String>>) = claimsJws.body["authorities"] as List<Map<String, String>>
+            val authorities: (List<Map<String, String>>) = claimsJws.body["authorities"] as List<Map<String, String>>
 
 
-        val simpleGrantedAuthorities: Set<SimpleGrantedAuthority> = authorities.stream()
-                .map { m -> SimpleGrantedAuthority(m.get("authority")) }
-                .collect(Collectors.toSet())
+            val simpleGrantedAuthorities: Set<SimpleGrantedAuthority> = authorities.stream()
+                    .map { m -> SimpleGrantedAuthority(m["authority"]) }
+                    .collect(Collectors.toSet())
 
-        val authentication: Authentication = UsernamePasswordAuthenticationToken(
-                claimsJws.body.subject,
-                null,
-                simpleGrantedAuthorities
-        )
+            val authentication: Authentication = UsernamePasswordAuthenticationToken(
+                    claimsJws.body.subject,
+                    null,
+                    simpleGrantedAuthorities
+            )
 
-        SecurityContextHolder.getContext().authentication = authentication
-
+            SecurityContextHolder.getContext().authentication = authentication
+        } catch (e: JwtException) {
+            throw IllegalStateException(String.format("Token: %s cannot be trusted", token))
+        }
         filterChain.doFilter(request, response)
     }
-
 }
